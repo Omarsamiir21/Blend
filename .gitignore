@@ -1,0 +1,6 @@
+.env
+web/node_modules/
+web/dist/
+*.exe
+coverage/
+.env.db-password

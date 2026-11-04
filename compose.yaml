@@ -1,0 +1,55 @@
+services:
+  db:
+    image: postgres:17-bookworm
+    environment:
+      POSTGRES_DB: blend
+      POSTGRES_USER: blend
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    secrets: [db_password]
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "blend", "-d", "blend"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  migrate:
+    image: postgres:17-bookworm
+    depends_on:
+      db:
+        condition: service_healthy
+    secrets: [db_password]
+    volumes:
+      - ./db/migrations:/migrations:ro
+    entrypoint: ["/bin/sh", "-ec"]
+    command:
+      - |
+        export PGPASSWORD="$$(cat /run/secrets/db_password)"
+        for migration in /migrations/*.sql; do
+          psql -X -h db -U blend -d blend -f "$$migration"
+        done
+
+  api:
+    image: ${BLEND_IMAGE:-blend:local}
+    build: .
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      BLEND_HTTP_ADDR: 0.0.0.0:8080
+      DATABASE_URL: postgres://blend@db:5432/blend?sslmode=disable
+      BLEND_DB_PASSWORD_FILE: /run/secrets/db_password
+    secrets: [db_password]
+    ports:
+      - "127.0.0.1:${BLEND_PORT:-8080}:8080"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+
+secrets:
+  db_password:
+    file: ${BLEND_DB_PASSWORD_PATH:-./.env.db-password}
+
+volumes:
+  postgres_data:

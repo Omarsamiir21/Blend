@@ -1,0 +1,44 @@
+openapi: 3.1.0
+info:
+  title: Blend Appliance API
+  version: 0.1.0
+servers:
+  - url: /api/v1
+paths:
+  /system/live:
+    get:
+      operationId: getLiveness
+      responses:
+        '200':
+          description: API process is accepting requests
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status]
+                properties:
+                  status: {const: live}
+  /system/health:
+    get:
+      operationId: getReadiness
+      responses:
+        '200':
+          description: Database is reachable and foundation migration is present
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, database]
+                properties:
+                  status: {const: ready}
+                  database: {const: ready}
+        '503':
+          description: Database or required migration is unavailable
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, database]
+                properties:
+                  status: {const: unavailable}
+                  database: {const: unavailable}
