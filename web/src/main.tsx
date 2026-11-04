@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Icon, OverviewPreview, WorkflowPreview, workflows } from "./preview";
+import { Icon, WorkflowPreview, workflows } from "./preview";
+import { OverviewPreview, PreviewToolbar } from "./overview";
 import "./styles.css";
+import "./dashboard.css";
 
 type Readiness = "Checking" | "Ready" | "Unavailable" | "Connection failed";
 
-function SystemHealth() {
+function SystemHealth({ compact = false }: { compact?: boolean }) {
   const [status, setStatus] = useState<Readiness>("Checking");
   const [attempt, setAttempt] = useState(0);
 
@@ -31,10 +33,10 @@ function SystemHealth() {
   }, [attempt]);
 
   return (
-    <section className="panel" aria-labelledby="health-title">
+    <section className={compact ? "live-health" : "panel"} aria-labelledby="health-title">
       <div>
-        <h2 id="health-title">System health</h2>
-        <p>PostgreSQL connectivity and schema readiness</p>
+        <h2 id="health-title">{compact ? "Live appliance check" : "System health"}</h2>
+        {!compact && <p>PostgreSQL connectivity and schema readiness</p>}
       </div>
       <p role="status" className={status === "Ready" ? "ready" : undefined}>{status}</p>
       <button disabled={status === "Checking"} onClick={() => {
@@ -54,30 +56,29 @@ function App() {
     <div className="layout">
       <aside className="sidebar">
         <a className="brand" href="/" aria-label="Blend overview">blend<span>.</span></a>
-        <p className="sidebar-caption">Migration workspace</p>
+        <p className="sidebar-caption">VM Migration &amp; Recovery Appliance</p>
         <nav aria-label="Appliance">
-          <a href="/" aria-current={!workflow ? "page" : undefined}><Icon name="overview" />Overview</a>
+          <a href="/" aria-current={!workflow ? "page" : undefined}><Icon name="home" />Overview</a>
           {workflows.map((entry) => (
             <a key={entry.path} href={entry.path} aria-current={entry.path === currentPath ? "page" : undefined}>
               <Icon name={entry.icon} />{entry.name}
             </a>
           ))}
         </nav>
-        <div className="sidebar-foot"><span className="preview-dot" /> Design preview</div>
+        <div className="sidebar-foot"><span className="preview-dot" /><div><strong>Blend Appliance</strong><small>Design preview · v0.1.0</small></div></div>
       </aside>
       <div className="workspace">
-        <header className="topbar">
-          <span>Appliance <span className="breadcrumb-separator">/</span> <strong>{name}</strong></span>
-          <span className="badge"><span className="preview-dot" /> UI preview</span>
-        </header>
-        <main>
-          <div className="page-heading">
-            <span className="kicker">{workflow ? "Workspace" : "Appliance overview"}</span>
-            <h1>{workflow?.name ?? "Welcome to blend."}</h1>
-            <p className="description">{workflow?.summary ?? "Capture, migrate, and deploy complete virtual labs — your way."}</p>
-          </div>
-          {workflow ? <WorkflowPreview workflow={workflow} /> : <OverviewPreview />}
-          {(!workflow || workflow.path === "/infrastructure") && <SystemHealth />}
+        <PreviewToolbar />
+        <main className={workflow ? undefined : "dashboard"}>
+          {workflow ? <>
+            <div className="page-heading">
+              <span className="kicker">Workspace</span>
+              <h1>{name}</h1>
+              <p className="description">{workflow.summary}</p>
+            </div>
+            <WorkflowPreview workflow={workflow} />
+            {workflow.path === "/infrastructure" && <SystemHealth />}
+          </> : <OverviewPreview health={<SystemHealth compact />} />}
         </main>
       </div>
     </div>

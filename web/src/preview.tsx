@@ -57,6 +57,14 @@ export const workflows: Workflow[] = [
 ];
 
 const icons: Record<string, string> = {
+  home: "M3 11 12 3l9 8 M5 10v11h5v-6h4v6h5V10",
+  search: "M20 20l-4-4 M18 11a7 7 0 1 1-14 0 7 7 0 0 1 14 0",
+  bell: "M5 16h14l-2-3V9a5 5 0 0 0-10 0v4z M10 19a2 2 0 0 0 4 0",
+  help: "M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0 M9 9a3 3 0 0 1 6 0c0 2-3 2-3 4 M12 17h.01",
+  user: "M20 21H4v-2c0-3 3-5 8-5s8 2 8 5z M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0",
+  monitor: "M3 4h18v13H3z M12 17v4 M8 21h8",
+  database: "M21 6c0 2-4 4-9 4S3 8 3 6s4-4 9-4 9 2 9 4v12c0 2-4 4-9 4s-9-2-9-4V6 M3 12c0 2 4 4 9 4s9-2 9-4",
+  pulse: "M2 13h5l3-9 4 16 3-7h5",
   overview: "M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z",
   grid: "M3 5h7l2 2h9v13H3z",
   server: "M3 4h18v7H3z M3 13h18v7H3z M7 7.5h.01 M7 16.5h.01 M12 7.5h5 M12 16.5h5",
@@ -69,45 +77,6 @@ const icons: Record<string, string> = {
 
 export function Icon({ name }: { name: string }) {
   return <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d={icons[name]} /></svg>;
-}
-
-function Datacenter() {
-  return <div className="rack" aria-hidden="true">
-    <span /><span /><span />
-  </div>;
-}
-
-export function OverviewPreview() {
-  const actions = [
-    ["Capture", "Collect and verify source disks", "/captures", "capture"],
-    ["Deploy", "Map a capture to Proxmox", "/deployments", "deploy"],
-    ["Recover", "Prepare an offline recovery package", "/recovery", "recovery"],
-  ];
-  return <>
-    <section className="transfer" aria-label="Planned source and destination workflow">
-      <div className="transfer-header"><span className="kicker">Migration path</span><span className="badge">Workflow preview</span></div>
-      <div className="transfer-map">
-        <div className="endpoint"><Datacenter /><div><strong>Source</strong><small>Guest machines</small></div></div>
-        <div className="transfer-line" aria-hidden="true" />
-        <div className="endpoint"><Datacenter /><div><strong>Destination</strong><small>Proxmox VE</small></div></div>
-      </div>
-    </section>
-    <div className="action-grid">
-      {actions.map(([name, description, path, icon]) => <a className="action-card" key={path} href={path}>
-        <span className="tile-icon"><Icon name={icon} /></span>
-        <strong>{name}</strong><span>{description}</span><span className="action-arrow" aria-hidden="true">→</span>
-      </a>)}
-    </div>
-    <section className="metric-grid" aria-label="Planned appliance metrics">
-      {["Labs", "Machines", "Storage used", "Active tasks"].map((label) => <div className="metric" key={label}>
-        <span>{label}</span><strong aria-label="Unavailable">—</strong><small>Data integration pending</small>
-      </div>)}
-    </section>
-    <section className="surface activity">
-      <div><h2>Active tasks</h2><p>Capture, deployment, and recovery progress will appear here when job tracking is connected.</p></div>
-      <span className="badge">Being built</span>
-    </section>
-  </>;
 }
 
 export function WorkflowPreview({ workflow }: { workflow: Workflow }) {
