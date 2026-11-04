@@ -2,8 +2,12 @@ import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Icon, WorkflowPreview, workflows } from "./preview";
 import { OverviewPreview, PreviewToolbar } from "./overview";
+import { LabsWorkspace, type SaveLab } from "./labs";
+import { CapturesWorkspace } from "./captures";
+import { readLabs, saveLabs } from "./lab-model";
 import "./styles.css";
 import "./dashboard.css";
+import "./labs.css";
 
 type Readiness = "Checking" | "Ready" | "Unavailable" | "Connection failed";
 
@@ -51,6 +55,29 @@ function App() {
   const currentPath = window.location.pathname.replace(/\/$/, "") || "/";
   const workflow = workflows.find((entry) => entry.path === currentPath);
   const name = workflow?.name ?? "Overview";
+  const query = new URLSearchParams(window.location.search);
+  const [labs, setLabs] = useState(readLabs);
+  const saveLab: SaveLab = (lab) => {
+    const current = readLabs();
+    const next = current.some((entry) => entry.id === lab.id) ?
+      current.map((entry) => entry.id === lab.id ? lab : entry) : [...current, lab];
+    try {
+      saveLabs(next);
+      setLabs(next);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+  useEffect(() => {
+    const refresh = () => setLabs(readLabs());
+    window.addEventListener("pageshow", refresh);
+    window.addEventListener("storage", refresh);
+    return () => {
+      window.removeEventListener("pageshow", refresh);
+      window.removeEventListener("storage", refresh);
+    };
+  }, []);
 
   return (
     <div className="layout">
@@ -69,8 +96,9 @@ function App() {
       </aside>
       <div className="workspace">
         <PreviewToolbar />
-        <main className={workflow ? undefined : "dashboard"}>
-          {workflow ? <>
+        <main className={currentPath === "/labs" || currentPath === "/captures" ? "lab-workspace" : workflow ? undefined : "dashboard"}>
+          {currentPath === "/labs" ? <LabsWorkspace labs={labs} save={saveLab} query={query} /> :
+          currentPath === "/captures" ? <CapturesWorkspace labs={labs} save={saveLab} query={query} /> : workflow ? <>
             <div className="page-heading">
               <span className="kicker">Workspace</span>
               <h1>{name}</h1>

@@ -16,6 +16,8 @@
 
 ## Subsequent milestones
 
+The Labs and Captures UI preview lets operators create browser-local lab drafts, enter planned machine inventory, see shared topology, and review a synthetic capture against the plan. This workflow does not enroll agents, capture disks, or provision VMs. The TypeScript and Vite build passed, and browser verification covered lab creation, three-machine topology, capture prefill after a deep-link reload, a flagged memory difference, review status, and narrow layouts without page overflow.
+
 1. Appliance identity, RBAC, enrollment, inventory and audit.
 2. Linux disk capture, interrupted upload resume and byte-identical reconstruction.
 3. Proxmox deployment and observed Linux boot.
