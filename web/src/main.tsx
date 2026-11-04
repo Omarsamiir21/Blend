@@ -1,17 +1,7 @@
 import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
+import { Icon, OverviewPreview, WorkflowPreview, workflows } from "./preview";
 import "./styles.css";
-
-const sections = [
-  ["Overview", "/", "Appliance status"],
-  ["Labs", "/labs", "Logical machine groups and network mappings"],
-  ["Machines", "/machines", "Enrolled guest inventory"],
-  ["Captures", "/captures", "Verified disk archives"],
-  ["Deployments", "/deployments", "Proxmox plans and deployment history"],
-  ["Recovery", "/recovery", "Portable packages and offline restoration"],
-  ["Infrastructure", "/infrastructure", "Appliance dependencies and destination connections"],
-  ["Settings", "/settings", "Appliance identity, storage, and policies"],
-] as const;
 
 type Readiness = "Checking" | "Ready" | "Unavailable" | "Connection failed";
 
@@ -57,25 +47,39 @@ function SystemHealth() {
 
 function App() {
   const currentPath = window.location.pathname.replace(/\/$/, "") || "/";
-  const [name, href, description] = sections.find((entry) => entry[1] === currentPath) ?? sections[0];
+  const workflow = workflows.find((entry) => entry.path === currentPath);
+  const name = workflow?.name ?? "Overview";
+
   return (
     <div className="layout">
-      <aside>
+      <aside className="sidebar">
         <a className="brand" href="/" aria-label="Blend overview">blend<span>.</span></a>
+        <p className="sidebar-caption">Migration workspace</p>
         <nav aria-label="Appliance">
-          {sections.map(([label, link]) => (
-            <a key={link} href={link} aria-current={link === href ? "page" : undefined}>{label}</a>
+          <a href="/" aria-current={!workflow ? "page" : undefined}><Icon name="overview" />Overview</a>
+          {workflows.map((entry) => (
+            <a key={entry.path} href={entry.path} aria-current={entry.path === currentPath ? "page" : undefined}>
+              <Icon name={entry.icon} />{entry.name}
+            </a>
           ))}
         </nav>
+        <div className="sidebar-foot"><span className="preview-dot" /> Design preview</div>
       </aside>
-      <main>
-        <header className="eyebrow">Blend appliance / {name}</header>
-        <h1>{href === "/" ? "Welcome to blend." : name}</h1>
-        <p className="description">{description}</p>
-        {href === "/" || href === "/infrastructure" ? <SystemHealth /> : (
-          <section className="panel"><p>This workflow is unavailable in the foundation build.</p></section>
-        )}
-      </main>
+      <div className="workspace">
+        <header className="topbar">
+          <span>Appliance <span className="breadcrumb-separator">/</span> <strong>{name}</strong></span>
+          <span className="badge"><span className="preview-dot" /> UI preview</span>
+        </header>
+        <main>
+          <div className="page-heading">
+            <span className="kicker">{workflow ? "Workspace" : "Appliance overview"}</span>
+            <h1>{workflow?.name ?? "Welcome to blend."}</h1>
+            <p className="description">{workflow?.summary ?? "Capture, migrate, and deploy complete virtual labs — your way."}</p>
+          </div>
+          {workflow ? <WorkflowPreview workflow={workflow} /> : <OverviewPreview />}
+          {(!workflow || workflow.path === "/infrastructure") && <SystemHealth />}
+        </main>
+      </div>
     </div>
   );
 }
