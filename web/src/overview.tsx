@@ -1,45 +1,6 @@
-import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Icon, workflows } from "./preview";
-
-function Globe() {
-  return <svg className="hero-globe" viewBox="0 0 700 340" aria-hidden="true">
-    <defs>
-      <linearGradient id="globe-fill" x2="0" y2="1">
-        <stop stopColor="#72cdf1" /><stop offset="1" stopColor="#eef6ff" stopOpacity=".12" />
-      </linearGradient>
-    </defs>
-    <path d="M5 330C82 140 228 24 397 25c144-2 254 61 303 119v186Z" fill="url(#globe-fill)" />
-    <g fill="#e3f4fb" opacity=".76">
-      <path d="m135 157 22-29 47-26 36-9 13-19 67-21 39-9 8 7-25 10 16 10-30 14 19 10-26 16-28-1-11 25-39 11-15 22-29-6-18 10 13 11-14 13-19-16-28 1z" />
-      <path d="m261 170 26 3 28 24 20 6-8 29-24 26-18 36-13-8 7-45-17-26-10-25zM342 60l28-10 48-6 34 6-17 17-43 7-22-2z" />
-      <path d="m441 110 13-18 29 1 14-16 42 5 24-8 60 18 23 15-17 9 35 12 21 28-24 7-26-17-30 4-19 18-17-12-36 5-8 23-22-16-30-8-12-23-23-4z" />
-      <path d="m453 150 35 5 18 20 25 7-11 26-21 28-21 7-15-29-12-7-12-27zM614 217l25-12 25 6 19 23-16 17-38-4-21-15z" />
-    </g>
-    <path d="M52 244C220 167 499 139 698 185M112 169C261 107 493 87 674 126M289 38c-58 39-104 111-117 190m233-203c-6 51-8 115 2 189m82-177c66 27 123 81 151 151" fill="none" stroke="#f5fbff" strokeOpacity=".31" />
-  </svg>;
-}
-
-function Rack() {
-  const id = useId();
-  return <svg className="rack-art" viewBox="0 0 260 156" aria-hidden="true">
-    <defs>
-      <linearGradient id={id} x2="1" y2="1"><stop stopColor="#416d88" /><stop offset="1" stopColor="#102e46" /></linearGradient>
-    </defs>
-    <ellipse cx="130" cy="140" rx="115" ry="11" fill="#51cee4" opacity=".27" />
-    <path d="M13 129 123 105 247 125 135 151Z" fill="#5796ac" />
-    <path d="M13 129v8l122 18 112-23v-7l-112 26Z" fill="#28536e" />
-    <path d="M23 134l82 12m50 1 81-18" stroke="#35e8ff" strokeWidth="2.5" strokeLinecap="round" />
-    <path d="m37 64 35-13v76l-35 7zM195 53l26 9v68l-26-5z" fill="#315e78" />
-    <path d="M63 43 126 16l74 25v87l-74 13-63-13Z" fill="#143b54" />
-    <path d="M63 43 126 16v125l-63-13Z" fill={`url(#${id})`} />
-    <path d="M126 16 200 41v87l-74 13Z" fill="#274f69" />
-    <path d="M78 49 116 35v91l-38-5Zm59-14 48 14v72l-48 7Z" fill="#08283e" />
-    <g stroke="#15cae8" strokeWidth="4" opacity=".88">
-      <path d="m82 55 30-10m-30 17 30-10m-30 17 30-10m29-14 40 11m-40-4 40 11m-40-4 40 11" />
-    </g>
-    <path d="M126 17v123M64 44l62-26 74 24" fill="none" stroke="#638ba3" strokeWidth="1.5" />
-  </svg>;
-}
+import migrationHero from "./assets/migration-hero.png";
 
 export function PreviewToolbar() {
   const [query, setQuery] = useState("");
@@ -100,19 +61,17 @@ const tasks = [
 export function OverviewPreview({ health }: { health: ReactNode }) {
   return <>
     <section className="dashboard-hero" aria-label="Migration workflow example">
-      <Globe />
+      <img className="hero-art" src={migrationHero} alt="" width="2172" height="724" />
       <div className="hero-copy">
         <div className="hero-caption"><span className="kicker">Overview</span><span className="badge">Design preview · sample data</span></div>
         <h1>Welcome to <em>blend<span>.</span></em></h1>
         <p>Capture, migrate, and deploy complete virtual labs — your way.</p>
       </div>
       <div className="migration-scene">
-        <div className="migration-line" aria-hidden="true" />
         {[
           ["Source", "Skillable / Remote VM", "monitor"],
           ["Destination", "Proxmox VE", "server"],
         ].map(([label, description, icon]) => <div className="migration-endpoint" key={label}>
-          <Rack />
           <div className="endpoint-label"><Icon name={icon} /><div><strong>{label}</strong><small>{description}</small></div></div>
         </div>)}
       </div>
